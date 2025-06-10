@@ -1,0 +1,17 @@
+{
+  "name": "exercise---classes",
+  "version": "1.0.0",
+  "main": "01.js",
+  "type": "module",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "chai": "^5.2.0",
+    "mocha": "^11.6.0"
+  }
+}
