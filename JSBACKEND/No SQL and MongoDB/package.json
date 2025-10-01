@@ -1,0 +1,17 @@
+{
+  "name": "no-sql-and-mongodb",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ",
+    "dev": "node --watch index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module",
+  "dependencies": {
+    "mongodb": "^6.20.0",
+    "mongoose": "^8.18.3"
+  }
+}
