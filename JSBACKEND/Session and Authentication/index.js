@@ -2,8 +2,10 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import expressSession from 'express-session';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const users = [];
+const JWT_SECRET = 'MYSECRETPASSWORD';
 
 const app = express();
 
@@ -152,12 +154,36 @@ app.post('/login', async (req, res) => {
 
     if (!isPassValid) return res.send('Invalid password!');
 
-    res.send(`Welcome ${username}`);
-    // res.redirect('/profile');
+    // Issue JWT Token
+    const payload = {
+        id: user.id,
+        username: user.username,
+        admin: false,
+    };
+
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '2h' });
+
+    // Attach token to cookie
+    res.cookie('auth', token);
+
+    console.log(token);
+
+    // res.send(`Welcome ${username}`);
+    res.redirect('/profile');
 });
 
 app.get('/profile', (req, res) => {
-    res.send(`Welcome ${username}`);
+    const token = req.cookies['auth'];
+
+    // Validate token
+    try {
+        const decodedToken = jwt.verify(token, JWT_SECRET);
+
+        res.send(`Welcome ${decodedToken.username}`);
+
+    } catch (err) {
+        res.status(401).send('Unauthorized!');
+    }
 })
 
 app.listen(5000, () => console.log('Server is listening on http://localhost:5000'));
