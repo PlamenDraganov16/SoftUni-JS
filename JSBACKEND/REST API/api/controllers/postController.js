@@ -1,29 +1,39 @@
-import { Router } from "express"
+import { Router } from "express";
+
 import Post from "../models/Post.js";
+import { getErrorMessage } from "../utils/errorUtils.js";
 
 const postController = Router();
 
-//Get posts
+// Get posts
 postController.get('/', async (req, res) => {
-    const posts = await Post.find();
+    const posts = await Post.find().populate('author');
 
-    res.json(posts).status(200);
+    res.json(posts);
 });
 
-//Create post
+// Create post
 postController.post('/', async (req, res) => {
-    const data = req.body;
+    const postData = req.body;
+    const userId = req.user.id;
 
-    const createdPost = await Post.create(data);
+    try {
+        const createdPost = await Post.create({
+            ...postData,
+            author: userId,
+        });
 
-    res.status(201).json(createdPost);
+        res.status(201).json(createdPost);
+    } catch (err) {
+        res.status(400).json({ message: getErrorMessage(err) })
+    }
 });
 
-//Get post details
+// Get post details
 postController.get('/:postId', async (req, res) => {
     const postId = req.params.postId;
 
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId).populate('author');
 
     if (!post) {
         return res.status(404).end();
@@ -32,23 +42,27 @@ postController.get('/:postId', async (req, res) => {
     res.json(post);
 });
 
-//Edit post
+// Edit post
 postController.put('/:postId', async (req, res) => {
     const postId = req.params.postId;
     const postData = req.body;
 
-    const updatedPost = await Post.findByIdAndUpdate(postId, postData);
+    try {
+        const updatedPost = await Post.findByIdAndUpdate(postId, postData, { runValidators: true });
 
-    res.json(updatedPost);
+        res.json(updatedPost);
+    } catch (err) {
+        res.status(400).json({ message: getErrorMessage(err) });
+    }
 });
 
-//Delete post
+// Delete post
 postController.delete('/:postId', async (req, res) => {
     const postId = req.params.postId;
 
     await Post.findByIdAndDelete(postId);
 
-    res.status(204);
-})
+    res.status(204).end();
+});
 
 export default postController;

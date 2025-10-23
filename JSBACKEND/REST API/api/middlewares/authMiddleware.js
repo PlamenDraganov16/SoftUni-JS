@@ -1,16 +1,18 @@
 import jwt from 'jsonwebtoken';
 
-export default function authMiddleware(req, res, next) {
+export function authMiddleware(req, res, next) {
     const token = req.header('X-Authorization');
 
-    if(!token) {
+    if (!token) {
         return next();
     }
 
     try {
-        const decoded = jwt.verify('token', 'ESIYBFW47F324FWEF');
+        const decoded = jwt.verify(token, 'ASDASJKLDHASIKJDKASJHD');
 
         req.user = decoded;
+
+        next();
     } catch (err) {
         res.status(401).end();
     }
